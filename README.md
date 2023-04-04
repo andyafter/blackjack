@@ -2,4 +2,4 @@
 
 ### Running
 
-    python BlackJack.py strategy/BasicStrategy.csv
+    python blackjack.py strategy/BasicStrategy.csv
