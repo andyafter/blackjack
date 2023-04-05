@@ -1,5 +1,4 @@
 numpy
 scipy
-pylab
 matplotlib
 importer
