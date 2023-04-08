@@ -43,14 +43,14 @@ class Shuffler(object):
             # clean up the bucket
             self.buckets[bucket] = []
 
-        return self.cards_buffer.pop()
+        return self.cards_buffer.pop(0)  #a bucket of cards will be dealt from index 0
 
     def insert_into_bucket(self, card):
         # insert card into certain bucket in a randomly order
         # TODO: check if it's actually randomly inserted, if not, change the rules
         bucket = self.get_bucket_for_insert()
-        self.buckets[bucket].append(card)
-        shuffle(self.buckets[bucket]) #by Alex: why shuffle the buckets?
+        self.buckets[bucket].append(card) #suppose shuffled-back card will be put at very end of a bucket
+        #shuffle(self.buckets[bucket]) 
 
     def shuffle_back(self, dealt_cards):
         for card in dealt_cards:
