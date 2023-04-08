@@ -11,7 +11,7 @@ from strategy_importer import StrategyImporter
 
 GAMES = 20000
 SHOE_SIZE = 6
-SHOE_PENETRATION = 0.25
+SHOE_PENETRATION = 0.2 # reshuffle after 80% of all cards are played
 BET_SPREAD = 20.0
 
 DECK_SIZE = 52.0
@@ -483,7 +483,7 @@ if __name__ == "__main__":
     moneys = sorted(moneys)
     fit = stats.norm.pdf(moneys, np.mean(moneys), np.std(moneys))  # this is a fitting indeed
     pl.plot(moneys, fit, '-o')
-    pl.hist(moneys, normed=True)
+    pl.hist(moneys, density=True)
     pl.show()
 
     plt.ylabel('count')

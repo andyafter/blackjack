@@ -2,7 +2,7 @@
 
 ### Running
 
-    python blackjack.py strategy/BasicStrategy.csv
+    python blackjack.py strategies/BasicStrategy.csv
 
 ### Definition of Terms
 
