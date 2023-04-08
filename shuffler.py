@@ -20,7 +20,7 @@ class Shuffler(object):
             generate a bucket number randomly for inserting one card
         """
         target = randint(0, len(self.buckets) - 1)
-        while len(self.buckets[target]) > 10:
+        while len(self.buckets[target]) > 10:   #by alex: should be >=10
             target = randint(0, len(self.buckets) - 1)
         return target
 
@@ -50,7 +50,7 @@ class Shuffler(object):
         # TODO: check if it's actually randomly inserted, if not, change the rules
         bucket = self.get_bucket_for_insert()
         self.buckets[bucket].append(card)
-        shuffle(self.buckets[bucket])
+        shuffle(self.buckets[bucket]) #by Alex: why shuffle the buckets?
 
     def shuffle_back(self, dealt_cards):
         for card in dealt_cards:
