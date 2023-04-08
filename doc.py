@@ -15,4 +15,4 @@ def deal_board(sh, board_size):
     return dealt_cards
 
 # if after running this there's no "incomplete deck" error, things are good!
-deal_board(sh, BOARD_CARD_NUMBER)
+print(deal_board(sh, BOARD_CARD_NUMBER))

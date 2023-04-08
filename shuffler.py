@@ -20,7 +20,7 @@ class Shuffler(object):
             generate a bucket number randomly for inserting one card
         """
         target = randint(0, len(self.buckets) - 1)
-        while len(self.buckets[target]) > 10:   #by alex: should be >=10
+        while len(self.buckets[target]) >= 10:   #by alex: should be >=10
             target = randint(0, len(self.buckets) - 1)
         return target
 
