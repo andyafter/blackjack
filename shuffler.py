@@ -9,6 +9,7 @@ class Shuffler(object):
         self.shoe_size = SHOE_SIZE
         self.cards_map = {}
         self.cards_buffer = []
+        self.cards_dealt = [] #cards dealt but yet to be shuffled back
         for card in self.deck:
             # incase if we need to mark the status of each card
             self.cards_map[card] = 1
@@ -36,12 +37,14 @@ class Shuffler(object):
             target = randint(0, len(self.buckets) - 1)
         return target
     
-    def get_card(self):
+    def deal(self):
         if len(self.cards_buffer) == 0:
             bucket = self.get_bucket_for_dealing()
             self.cards_buffer = self.cards_buffer + self.buckets[bucket]
             # clean up the bucket
             self.buckets[bucket] = []
+        
+        self.cards_dealt.append(self.cards_buffer[0])
 
         return self.cards_buffer.pop(0)  #a bucket of cards will be dealt from index 0
 
@@ -52,9 +55,11 @@ class Shuffler(object):
         self.buckets[bucket].append(card) #suppose shuffled-back card will be put at very end of a bucket
         #shuffle(self.buckets[bucket]) 
 
-    def shuffle_back(self, dealt_cards):
-        for card in dealt_cards:
+    def shuffle_back(self):
+        shuffle(self.cards_dealt) #TODO: improve accuracy
+        for card in self.cards_dealt:
             self.insert_into_bucket(card)
+        self.cards_dealt=[] #clear dealt cards 
         self.check_total()
 
     def check_total(self):
