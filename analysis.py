@@ -5,7 +5,7 @@ import math
 
 
 SHOE_SIZE = 6
-BOARD_CARD_NUMBER = 20
+BOARD_CARD_NUMBER = 15
 
 cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
 
@@ -35,11 +35,11 @@ def calcSmallCard(board):
 TCRollingStrategy=[{"max":4,"weight":{1:1,2:1,3:1,4:1}},{"max":8,"weight":{1:1,2:1,3:1,4:1,5:0.5,6:0.5,7:0.5,8:0.5}},
                    {"max":6,"weight":{1:1,2:1,3:1,4:1,5:0.5,6:0.5}},{"max":8,"weight":{1:1,2:0.9,3:0.8,4:0.7,5:0.6,6:0.5,7:0.4,8:0.3}}]
 
-def reappearDistribution():
-    SIZE=1000
+def reappearDistribution(sh):
+    SIZE=1000000
     cardSequence=[]
     board_size=0
-    clearFrequency=1000
+    clearFrequency=10000
     dist={}
     for i in range(SIZE):
         newCard=sh.deal(False)
@@ -49,10 +49,10 @@ def reappearDistribution():
         while j<len(cardSequence) and newCard!=cardSequence[-1-j]:
             j+=1
         if j<len(cardSequence):
-            if j not in dist:
-                dist[j]=1
+            if int(j/BOARD_CARD_NUMBER) not in dist:
+                dist[int(j/BOARD_CARD_NUMBER)]=1
             else:
-                dist[j]+=1
+                dist[int(j/BOARD_CARD_NUMBER)]+=1
             cardSequence[-1-j]=-1 #-1 means this card has reappeared
         if board_size==BOARD_CARD_NUMBER:
             board_size=0
@@ -61,11 +61,54 @@ def reappearDistribution():
             while cardSequence[0]==-1: #clear consecutive reappeared cards in the beginning of the sequence
                 cardSequence.pop(0)
     #print(dist)
-    plt.bar(dist.keys(),dist.values())
-    
+    plt.bar(dist.keys(),list(map(lambda x:x/SIZE, dist.values())))
+    plt.show()
+
+def delayEffect(sh):
+
+    def commonCards(listA,listB):
+        count=0
+        for card in listA:
+            if card in listB:
+                count+=1
+        return count
+
+    SIZE=1000000
+    cardSequence=[]
+    boardSequence=[[]]
+    cardCount=0
+    boardCount=0
+    dist={}
+    times={}
+    for i in range(SIZE):
+        newCard=sh.deal(False)
+        cardCount+=1
+        if cardCount>=BOARD_CARD_NUMBER:
+            cardCount=0
+            boardCount+=1
+            boardSequence.append([])
+            sh.shuffle_back()
+        boardSequence[boardCount].append(newCard)
+    for i in range(len(boardSequence)):
+        for j in range(i+1,min(i+10,len(boardSequence))):
+            if j-i not in dist:
+                dist[j-i]=commonCards(boardSequence[i],boardSequence[j])
+                times[j-i]=1
+            else:
+                dist[j-i]+=commonCards(boardSequence[i],boardSequence[j])
+                times[j-i]+=1
+    for key in dist:
+        if times[key]!=0:
+            dist[key]=dist[key]/times[key]
+    print(dist)
+    #plt.bar(dist.keys(),dist.values())
+    #plt.show()
+            
 
 sh=Shuffler(SHOE_SIZE)
-reappearDistribution()
+#reappearDistribution()
+delayEffect(sh)
+
 
 '''
 TCList=[]
