@@ -1,6 +1,10 @@
 from random import shuffle, randint
 
-class Shuffler(object):
+class Shuffler:
+
+    _trueCount=0
+    cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
+
     def __init__(self, SHOE_SIZE):
         self.buckets = []
         for i in range(38):
@@ -15,6 +19,9 @@ class Shuffler(object):
             self.cards_map[card] = 1
             self.insert_into_bucket(card)
         self.check_total()
+    
+    def convertToCardname(self, serial):
+        return self.cardNameMap[serial%13]
 
     def get_bucket_for_insert(self):
         """
@@ -37,16 +44,19 @@ class Shuffler(object):
             target = randint(0, len(self.buckets) - 1)
         return target
     
-    def deal(self):
+    def deal(self, ifCovertToCardname=True):
         if len(self.cards_buffer) == 0:
             bucket = self.get_bucket_for_dealing()
             self.cards_buffer = self.cards_buffer + self.buckets[bucket]
             # clean up the bucket
             self.buckets[bucket] = []
         
-        self.cards_dealt.append(self.cards_buffer[0])
+        self.cards_dealt.append(self.cards_buffer[0]) #a bucket of cards will be dealt from index 0
 
-        return self.cards_buffer.pop(0)  #a bucket of cards will be dealt from index 0
+        if ifCovertToCardname:
+            return self.convertToCardname(self.cards_buffer.pop(0))
+        else:
+            return self.cards_buffer.pop(0)
 
     def insert_into_bucket(self, card):
         # insert card into certain bucket in a randomly order
@@ -68,3 +78,19 @@ class Shuffler(object):
             deck_size += len(bucket)
         if deck_size != self.shoe_size * 52:
             print("deck size error, incomplete deck!")
+
+    @property
+    def trueCount(self):
+        self._trueCount=0
+        return self._trueCount
+    
+'''   
+if __name__ == "__main__":
+    shuffler = Shuffler(6)
+    for i in range(50):
+        print("deal: %s " % shuffler.deal(False))
+        print("card buffer: %s " % shuffler.cards_buffer)
+        print("dealt cards %s " % shuffler.cards_dealt)
+        if i%15==0:
+            shuffler.shuffle_back()
+'''

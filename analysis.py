@@ -1,6 +1,6 @@
 from random import randint
-from doc import deal_board
 from shuffler import Shuffler
+import matplotlib.pyplot as plt
 import math
 
 
@@ -8,9 +8,6 @@ SHOE_SIZE = 6
 BOARD_CARD_NUMBER = 20
 
 cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
-
-def convertToCardname(serial):
-    return cardNameMap[serial%13]
 
 def calcTrueCount(board):
     TC=0
@@ -38,8 +35,39 @@ def calcSmallCard(board):
 TCRollingStrategy=[{"max":4,"weight":{1:1,2:1,3:1,4:1}},{"max":8,"weight":{1:1,2:1,3:1,4:1,5:0.5,6:0.5,7:0.5,8:0.5}},
                    {"max":6,"weight":{1:1,2:1,3:1,4:1,5:0.5,6:0.5}},{"max":8,"weight":{1:1,2:0.9,3:0.8,4:0.7,5:0.6,6:0.5,7:0.4,8:0.3}}]
 
-sh=Shuffler(SHOE_SIZE)
+def reappearDistribution():
+    SIZE=1000
+    cardSequence=[]
+    board_size=0
+    clearFrequency=1000
+    dist={}
+    for i in range(SIZE):
+        newCard=sh.deal(False)
+        board_size+=1
+        cardSequence.append(newCard)
+        j=1
+        while j<len(cardSequence) and newCard!=cardSequence[-1-j]:
+            j+=1
+        if j<len(cardSequence):
+            if j not in dist:
+                dist[j]=1
+            else:
+                dist[j]+=1
+            cardSequence[-1-j]=-1 #-1 means this card has reappeared
+        if board_size==BOARD_CARD_NUMBER:
+            board_size=0
+            sh.shuffle_back()
+        if i%clearFrequency==0:
+            while cardSequence[0]==-1: #clear consecutive reappeared cards in the beginning of the sequence
+                cardSequence.pop(0)
+    #print(dist)
+    plt.bar(dist.keys(),dist.values())
+    
 
+sh=Shuffler(SHOE_SIZE)
+reappearDistribution()
+
+'''
 TCList=[]
 bigCardList=[]
 smallCardList=[]
@@ -95,13 +123,5 @@ print("TC Frequency", TCFrequency)
 print("avg small card number", TCSmallCard)
 print("avg big card number", TCBigCard)
 print("avg big minus small card number", TCBigMinusSmallCard)
-        
-
-
-
-
-
-
-
-
+'''
 

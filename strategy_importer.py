@@ -19,7 +19,7 @@ class StrategyImporter(object):
 		with open(self.player_file, 'r') as player_csv:
 			reader = csv.DictReader(player_csv, delimiter = ';')
 			for row in reader:
-				if hard >= 5:
+				if hard >= 4:
 					self.hard_strategy[hard] = row
 					hard -= 1 
 				elif soft >= 12:
