@@ -69,66 +69,6 @@ class Hand:
                 self._aces_soft += 1
         return self._aces_soft
 
-    def soft(self):
-        """
-        Determines whether the current hand is soft (soft means that it consists of aces valued at 11).
-        """
-        return self._isSoft
-
-    def splitable(self):
-        """
-        Determines if the current hand can be splitted.
-        """
-        if self.length() == 2 and self.cards[0] == self.cards[1]:
-            if self.cards[0] == "A" and self.splithand:
-                return False
-            else:
-                return True
-        else:
-            return False
-
-    def blackjack(self):
-        """
-        Check a hand for a blackjack
-        """
-        if not self.splithand and self.value == 21 and self.length() == 2:
-            return True
-        else:
-            return False
-
-    def busted(self):
-        """
-        Checks if the hand is busted.
-        """
-        if self.value > 21:
-            return True
-        else:
-            return False
-
-    def add_card(self, card):
-        """
-        Add a card to the current hand.
-        """
-        self.cards.append(card)
-        self._value=self.value #whenever a new card is added, the value will be calculated again as well as whether it is soft
-
-    def split(self):
-        """
-        Split the current hand.
-        Returns: The new hand created from the split.
-        """
-        self.splithand = True
-        c = self.cards.pop()
-        new_hand = Hand([c])
-        new_hand.splithand = True
-        return new_hand
-
-    def length(self):
-        """
-        Returns: The number of cards in the current hand.
-        """
-        return len(self.cards)
-    
 sh=Shuffler(6,{"max":4,"weight":{1:1,2:1,3:1,4:1}})
 
 class Player:
