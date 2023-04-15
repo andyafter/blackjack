@@ -8,12 +8,12 @@ class Hand:
     _value = 0
     _aces = []
     _aces_soft = 0
-    _isSoft=False
+    _is_soft=False
     splithand = False
     surrender = False
     doubled = False
     pnl=0
-    cardValues={"A":1,"K":10,"Q":10,"J":10,"T":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2} # A is 1 by default
+    card_values={"A":1,"K":10,"Q":10,"J":10,"T":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2} # A is 1 by default
 
     def __init__(self, cards): # cards is a list of card, each card is a letter from A to K
         self.cards = cards
@@ -26,13 +26,13 @@ class Hand:
         return h
     
     @property
-    def containAce(self):
-        self._containAce=False
+    def contain_ace(self):
+        self._contain_ace=False
         for c in self.cards:
             if c == "A":
-                self._containAce=True
-                return self._containAce
-        return self._containAce
+                self._contain_ace=True
+                return self._contain_ace
+        return self._contain_ace
 
     @property
     def value(self):
@@ -41,10 +41,10 @@ class Hand:
         """
         self._value = 0
         for c in self.cards:
-            self._value += self.cardValues[c] # A is 1 by default
-        if self._value<=11 and self.containAce:
+            self._value += self.card_values[c] # A is 1 by default
+        if self._value<=11 and self.contain_ace:
             self._value+=10
-            self._isSoft=True
+            self._is_soft=True
         return self._value
 
     @property
@@ -69,16 +69,76 @@ class Hand:
                 self._aces_soft += 1
         return self._aces_soft
 
+    def soft(self):
+        """
+        Determines whether the current hand is soft (soft means that it consists of aces valued at 11).
+        """
+        return self._is_soft
+
+    def splitable(self):
+        """
+        Determines if the current hand can be splitted.
+        """
+        if self.length() == 2 and self.cards[0] == self.cards[1]:
+            if self.cards[0] == "A" and self.splithand:
+                return False
+            else:
+                return True
+        else:
+            return False
+
+    def blackjack(self):
+        """
+        Check a hand for a blackjack
+        """
+        if not self.splithand and self.value == 21 and self.length() == 2:
+            return True
+        else:
+            return False
+
+    def busted(self):
+        """
+        Checks if the hand is busted.
+        """
+        if self.value > 21:
+            return True
+        else:
+            return False
+
+    def add_card(self, card):
+        """
+        Add a card to the current hand.
+        """
+        self.cards.append(card)
+        self._value=self.value #whenever a new card is added, the value will be calculated again as well as whether it is soft
+
+    def split(self):
+        """
+        Split the current hand.
+        Returns: The new hand created from the split.
+        """
+        self.splithand = True
+        c = self.cards.pop()
+        new_hand = Hand([c])
+        new_hand.splithand = True
+        return new_hand
+
+    def length(self):
+        """
+        Returns: The number of cards in the current hand.
+        """
+        return len(self.cards)
+    
 sh=Shuffler(6,{"max":4,"weight":{1:1,2:1,3:1,4:1}})
 
 class Player:
     """
     Represent a player
     """
-    def __init__(self, basicStrategy, hand=None, dealer_hand=None):
+    def __init__(self, basic_strategy, hand=None, dealer_hand=None):
         self.hands = [hand]
         self.dealer_hand = dealer_hand
-        self.basicStrategy = basicStrategy
+        self.basic_strategy = basic_strategy
         
     def set_hands(self, new_hand, new_dealer_hand):
         self.hands = [new_hand]
@@ -101,7 +161,7 @@ class Player:
 
             if hand.soft():
                 flag = SOFT_STRATEGY[hand.value][self.dealer_hand.cards[0]]
-            elif hand.splitable() and self.handNumbers<=4:
+            elif hand.splitable() and self.hand_numbers<=4:
                 flag = PAIR_STRATEGY[hand.value][self.dealer_hand.cards[0]]
             else:
                 flag = HARD_STRATEGY[hand.value][self.dealer_hand.cards[0]]
@@ -148,11 +208,11 @@ class Player:
         self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
 
     def playStrategy(self,sh): #adjust play strategy according to True Count
-        HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = self.basicStrategy
+        HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = self.basic_strategy
         return HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY
     
     @property
-    def handNumbers(self):
+    def hand_numbers(self):
         return len(self.hands) 
 
 class Dealer:
@@ -188,28 +248,28 @@ class Round:
     totalWin=0
     totalBet=0
 
-    def __init__(self, bet, sh, basicStrategy, playerNumber=5): #sh is a shuffler object
+    def __init__(self, bet, sh, basic_strategy, player_number=5): #sh is a shuffler object
         self.bet = bet
         self.sh=sh
-        self.basicStrategy=basicStrategy
-        self.playerNumber=playerNumber
+        self.basic_strategy=basic_strategy
+        self.player_number=player_number
         self.players=[]
     
     def playRound(self):
         "play a round"
         print("round begins")
-        playerInitialDeal=[None] * self.playerNumber
-        for i in range(self.playerNumber):
-            self.players.append(Player(self.basicStrategy))
-            playerInitialDeal[i]=Hand([self.sh.deal()]) # deal a first card to each player
+        player_initial_deal=[None] * self.player_number
+        for i in range(self.player_number):
+            self.players.append(Player(self.basic_strategy))
+            player_initial_deal[i]=Hand([self.sh.deal()]) # deal a first card to each player
         self.dealer=Dealer(Hand([self.sh.deal()])) # deal a card to the dealer
-        for i in range(self.playerNumber):
-            playerInitialDeal[i].add_card(self.sh.deal()) # deal a second card to each player
-            self.players[i].set_hands(playerInitialDeal[i],self.dealer.hand)
-            print("player %d, hand %s" % (i, playerInitialDeal[i]))
+        for i in range(self.player_number):
+            player_initial_deal[i].add_card(self.sh.deal()) # deal a second card to each player
+            self.players[i].set_hands(player_initial_deal[i],self.dealer.hand)
+            print("player %d, hand %s" % (i, player_initial_deal[i]))
             print("dealer hand %s" % self.dealer.hand)
 
-        for i in range(self.playerNumber):
+        for i in range(self.player_number):
             print("player %d plays" % i)
             self.players[i].play(self.sh)
         self.dealer.play(self.sh)
@@ -274,7 +334,7 @@ if __name__ == "__main__":
     for r in range(ROUNDS):
         round = Round(1,sh,basicStrategy) #TODO: vary bet size according to True Count
         round.playRound()
-        for i in range(round.playerNumber):
+        for i in range(round.player_number):
             for hand in round.players[i].hands:
                 nb_hands += 1
                 win, bet = round.get_hand_winnings(hand)
