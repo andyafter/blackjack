@@ -105,9 +105,9 @@ def delayEffect(sh):
     #plt.show()
             
 
-sh=Shuffler(SHOE_SIZE)
+#sh=Shuffler(SHOE_SIZE)
 #reappearDistribution()
-delayEffect(sh)
+#delayEffect(sh)
 
 
 '''

@@ -3,14 +3,18 @@ from random import shuffle, randint
 class Shuffler:
 
     _trueCount=0
+    _count=0
+    _roundCount=0
+    pastCountList=[]
     cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
 
-    def __init__(self, SHOE_SIZE):
+    def __init__(self, SHOE_SIZE, TCStrategy):
         self.buckets = []
         for i in range(38):
             self.buckets.append([])
         self.deck = list(range(SHOE_SIZE * 52))
         self.shoe_size = SHOE_SIZE
+        self.TCStrategy=TCStrategy
         self.cards_map = {}
         self.cards_buffer = []
         self.cards_dealt = [] #cards dealt but yet to be shuffled back
@@ -51,12 +55,15 @@ class Shuffler:
             # clean up the bucket
             self.buckets[bucket] = []
         
-        self.cards_dealt.append(self.cards_buffer[0]) #a bucket of cards will be dealt from index 0
+        c=self.cards_buffer.pop(0) #a bucket of cards will be dealt from index 0
+        self.cards_dealt.append(c)
+        self._count+=self.calcCardCount(self.convertToCardname(c))
+        self._roundCount+=self.calcCardCount(self.convertToCardname(c))
 
         if ifCovertToCardname:
-            return self.convertToCardname(self.cards_buffer.pop(0))
+            return self.convertToCardname(c)
         else:
-            return self.cards_buffer.pop(0)
+            return c
 
     def insert_into_bucket(self, card):
         # insert card into certain bucket in a randomly order
@@ -66,6 +73,14 @@ class Shuffler:
         #shuffle(self.buckets[bucket]) 
 
     def shuffle_back(self):
+        self.pastCountList.append(self._roundCount) #record round count
+        self._roundCount=0 # clear round count
+        if len(self.pastCountList)>self.TCStrategy["max"]:
+            self.pastCountList.pop(0)
+        self._count=0 # reset accumulative count
+        for i in range (min(len(self.pastCountList),self.TCStrategy["max"])):
+            self._count += self.pastCountList[-1-i] * self.TCStrategy["weight"][i+1]
+        
         shuffle(self.cards_dealt) #TODO: improve accuracy
         for card in self.cards_dealt:
             self.insert_into_bucket(card)
@@ -81,16 +96,32 @@ class Shuffler:
 
     @property
     def trueCount(self):
-        self._trueCount=0
+        self._trueCount=+1
         return self._trueCount
     
-'''   
+    def calcBoardCount(self,board):
+        TC=0
+        for card in board:
+            TC+=self.calcCardCount(card)
+        return TC
+    
+    def calcCardCount(self,card):
+        if card in ["2","3","4","5","6"]:
+            return 1
+        elif card in ["T","J","Q","K","A"]:
+            return -1
+        else:
+            return 0
+    
+
 if __name__ == "__main__":
-    shuffler = Shuffler(6)
+    sh = Shuffler(6,{"max":4,"weight":{1:1,2:1,3:1,4:1}})
+    
     for i in range(50):
-        print("deal: %s " % shuffler.deal(False))
-        print("card buffer: %s " % shuffler.cards_buffer)
-        print("dealt cards %s " % shuffler.cards_dealt)
+        print("deal: %s " % sh.deal(True))
+        print("count",sh._count)
+        #print("card buffer: %s " % sh.cards_buffer)
+        #print("dealt cards %s " % sh.cards_dealt)
         if i%15==0:
-            shuffler.shuffle_back()
-'''
+            sh.shuffle_back()
+

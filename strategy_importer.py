@@ -33,6 +33,6 @@ class StrategyImporter(object):
 	
 HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY=StrategyImporter('./strategies/BasicStrategy.csv').import_player_strategy()
 
-print(HARD_STRATEGY)
-print(SOFT_STRATEGY)
-print(PAIR_STRATEGY)
+#print(HARD_STRATEGY)
+#print(SOFT_STRATEGY)
+#print(PAIR_STRATEGY)

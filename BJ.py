@@ -129,7 +129,7 @@ class Hand:
         """
         return len(self.cards)
     
-sh=Shuffler(6)
+sh=Shuffler(6,{"max":4,"weight":{1:1,2:1,3:1,4:1}})
 
 class Player:
     """
@@ -150,9 +150,6 @@ class Player:
             self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
 
     def play_hand(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY):
-        
-        if hand.blackjack():
-            print ("Blackjack")
         
         while not hand.busted() and not hand.blackjack():
             if hand.length() < 2:
@@ -194,6 +191,7 @@ class Player:
 
             if flag == 'P':
                 self.split(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
+                break
 
             if flag == 'S':
                 print ("Stand, value = %d" % hand.value)
@@ -329,7 +327,9 @@ if __name__ == "__main__":
     roundList=[]
     betList=[]
     pnlList=[]
-    sh=Shuffler(6)
+    totalBet=0
+    totalPnL=0
+    sh=Shuffler(6,{"max":4,"weight":{1:1,2:1,3:1,4:1}})
 
     for r in range(ROUNDS):
         round = Round(1,sh,basicStrategy) #TODO: vary bet size according to True Count
@@ -343,11 +343,15 @@ if __name__ == "__main__":
         roundList.append(round)
         betList.append(round.totalBet)
         pnlList.append(round.totalWin)
+        totalBet+=round.totalBet
+        totalPnL+=round.totalWin
         sh.shuffle_back()
         
     
     print("Bet List",betList)
     print("pnl List",pnlList)
+    print("Total Bet = ", totalBet)
+    print("Total PnL = ", totalPnL)
         
         #countings += game.shoe.count_history
 
