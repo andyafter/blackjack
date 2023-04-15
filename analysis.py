@@ -9,7 +9,7 @@ BOARD_CARD_NUMBER = 15
 
 cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
 
-def calcTrueCount(board):
+def calculate_true_count(board):
     TC=0
     for card in board:
         if card in ["2","3","4","5","6"]:
@@ -18,14 +18,14 @@ def calcTrueCount(board):
             TC -=1
     return TC
 
-def calcBigCard(board):
+def calculate_big_card(board):
     BC=0
     for card in board:
         if card in ["T","J","Q","K","A"]:
             BC +=1
     return BC
 
-def calcSmallCard(board):
+def calculate_small_card(board):
     SC=0
     for card in board:
         if card in ["2","3","4","5","6"]:
@@ -35,7 +35,7 @@ def calcSmallCard(board):
 TCRollingStrategy=[{"max":4,"weight":{1:1,2:1,3:1,4:1}},{"max":8,"weight":{1:1,2:1,3:1,4:1,5:0.5,6:0.5,7:0.5,8:0.5}},
                    {"max":6,"weight":{1:1,2:1,3:1,4:1,5:0.5,6:0.5}},{"max":8,"weight":{1:1,2:0.9,3:0.8,4:0.7,5:0.6,6:0.5,7:0.4,8:0.3}}]
 
-def reappearDistribution(sh):
+def reappear_distribution(sh):
     SIZE=1000000
     cardSequence=[]
     board_size=0
@@ -64,9 +64,9 @@ def reappearDistribution(sh):
     plt.bar(dist.keys(),list(map(lambda x:x/SIZE, dist.values())))
     plt.show()
 
-def delayEffect(sh):
+def delay_effect(sh):
 
-    def commonCards(listA,listB):
+    def common_cards(listA,listB):
         count=0
         for card in listA:
             if card in listB:
@@ -92,10 +92,10 @@ def delayEffect(sh):
     for i in range(len(boardSequence)):
         for j in range(i+1,min(i+10,len(boardSequence))):
             if j-i not in dist:
-                dist[j-i]=commonCards(boardSequence[i],boardSequence[j])
+                dist[j-i]=common_cards(boardSequence[i],boardSequence[j])
                 times[j-i]=1
             else:
-                dist[j-i]+=commonCards(boardSequence[i],boardSequence[j])
+                dist[j-i]+=common_cards(boardSequence[i],boardSequence[j])
                 times[j-i]+=1
     for key in dist:
         if times[key]!=0:
