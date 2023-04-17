@@ -245,8 +245,8 @@ class Dealer:
 
 class Round:
     "represents a round of blackjack"
-    totalWin=0
-    totalBet=0
+    total_win=0
+    total_bet=0
 
     def __init__(self, bet, sh, basic_strategy, player_number=5): #sh is a shuffler object
         self.bet = bet
@@ -255,7 +255,7 @@ class Round:
         self.player_number=player_number
         self.players=[]
     
-    def playRound(self):
+    def play_round(self):
         "play a round"
         print("round begins")
         player_initial_deal=[None] * self.player_number
@@ -333,7 +333,7 @@ if __name__ == "__main__":
 
     for r in range(ROUNDS):
         round = Round(1, sh, basic_strategy)  # TODO: vary bet size according to True Count
-        round.playRound()
+        round.play_round()
         for i in range(round.player_number):
             for hand in round.players[i].hands:
                 nb_hands += 1
