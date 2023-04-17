@@ -1,6 +1,5 @@
 import csv
 
-
 class StrategyImporter(object):
 	"""
 	"""
@@ -17,10 +16,10 @@ class StrategyImporter(object):
 		soft = 21
 		pair = 20
 
-		with open(self.player_file, 'rU') as player_csv:
+		with open(self.player_file, 'r') as player_csv:
 			reader = csv.DictReader(player_csv, delimiter = ';')
 			for row in reader:
-				if hard >= 5:
+				if hard >= 4:
 					self.hard_strategy[hard] = row
 					hard -= 1 
 				elif soft >= 12:
@@ -31,3 +30,9 @@ class StrategyImporter(object):
 					pair -= 2
 
 		return self.hard_strategy, self.soft_strategy, self.pair_strategy
+	
+HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY=StrategyImporter('./strategies/BasicStrategy.csv').import_player_strategy()
+
+#print(HARD_STRATEGY)
+#print(SOFT_STRATEGY)
+#print(PAIR_STRATEGY)
