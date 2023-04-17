@@ -8,11 +8,13 @@ sh = Shuffler(SHOE_SIZE)
 
 def deal_board(sh, board_size):
     # deal a board with card number of board_size
-    dealt_cards = []
+    sh.shuffle_back()
     for i in range(board_size):
-        dealt_cards.append(sh.get_card())
-    sh.shuffle_back(dealt_cards)
-    return dealt_cards
+        #print(sh.deal())
+        sh.deal()
+    return sh.cards_dealt
 
 # if after running this there's no "incomplete deck" error, things are good!
-print(deal_board(sh, BOARD_CARD_NUMBER))
+# deal_board(sh, BOARD_CARD_NUMBER)
+
+
