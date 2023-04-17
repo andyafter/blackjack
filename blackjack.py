@@ -129,6 +129,9 @@ class Hand:
         """
         return len(self.cards)
     
+# TODO: Clean this up
+sh = Shuffler(6, {"max": 4, "weight": {1: 1, 2: 1, 3: 1, 4: 1}})
+    
 class Player:
     """
     Represent a player
@@ -260,9 +263,14 @@ class Round:
         for i in range(self.player_number):
             self.players.append(Player(self.basic_strategy))
             player_initial_deal[i]=Hand([self.sh.deal()]) # deal a first card to each player
-        self.dealer=Dealer(Hand([self.sh.deal()])) # deal a card to the dealer
+
+        dealer_init_hand = [self.sh.deal()]
+        player_initial_hands = []
+
+        self.dealer=Dealer(Hand([dealer_init_hand[0]])) # deal a card to the dealer
         for i in range(self.player_number):
             player_initial_deal[i].add_card(self.sh.deal()) # deal a second card to each player
+            player_initial_hands.append([player_initial_deal[i].cards[0], player_initial_deal[i].cards[1]])
             self.players[i].set_hands(player_initial_deal[i],self.dealer.hand)
             print("player %d, hand %s" % (i, player_initial_deal[i]))
             print("dealer hand %s" % self.dealer.hand)
@@ -271,6 +279,7 @@ class Round:
             print("player %d plays" % i)
             self.players[i].play(self.sh)
         self.dealer.play(self.sh)
+        return player_initial_hands, dealer_init_hand
 
     
     def get_hand_winnings(self, hand): # must first play the round
