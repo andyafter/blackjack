@@ -142,10 +142,10 @@ class Player:
         self.hands = [new_hand]
         self.dealer_hand = new_dealer_hand
 
-    def play(self, shoe):
+    def play(self, sh):
         for hand in self.hands:
             HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = self.playStrategy(sh)
-            self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
+            self.play_hand(hand, sh, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
 
     def play_hand(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY):
         
