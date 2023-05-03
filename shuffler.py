@@ -32,7 +32,7 @@ class Shuffler:
             generate a bucket number randomly for inserting one card
         """
         target = randint(0, len(self.buckets) - 1)
-        while len(self.buckets[target]) >= 10:   #by alex: should be >=10
+        while len(self.buckets[target]) >= 10:  
             target = randint(0, len(self.buckets) - 1)
         return target
 
@@ -80,7 +80,13 @@ class Shuffler:
         self._count=0 # reset accumulative count
         for i in range (min(len(self.pastCountList),self.TCStrategy["max"])):
             self._count += self.pastCountList[-1-i] * self.TCStrategy["weight"][i+1]
+        self._trueCount=self._count/self.TCStrategy["remaining_decks"]
         
+        #print("cards dealt in this round:" , list(map(self.convertToCardname,self.cards_dealt)))
+        #print("current count:", self._count)
+        #print("current true count:", self._trueCount)
+        #print("past count list:",self.pastCountList)
+
         shuffle(self.cards_dealt) #TODO: improve accuracy
         for card in self.cards_dealt:
             self.insert_into_bucket(card)

@@ -42,6 +42,9 @@ class Hand:
         self._value = 0
         for c in self.cards:
             self._value += self.card_values[c] # A is 1 by default
+        if self._value>=12:
+            self._is_soft=False
+            return self._value
         if self._value<=11 and self.contain_ace:
             self._value+=10
             self._is_soft=True
@@ -140,6 +143,8 @@ class Player:
         self.hands = [hand]
         self.dealer_hand = dealer_hand
         self.basic_strategy = basic_strategy
+        self.bet=0
+        self.win=0
         
     def set_hands(self, new_hand, new_dealer_hand):
         self.hands = [new_hand]
@@ -169,17 +174,17 @@ class Player:
 
             if flag == 'DH' or flag == 'DS':
                 if hand.length() == 2:
-                    print ("Double Down")
+                    #print ("Double Down")
                     hand.doubled = True
                     self.hit(hand, shoe)
-                    print("value = %d" % hand.value)
+                    #print("value = %d" % hand.value)
                     break
                 else:
                     flag = flag[1] # if cannot double, then stand (DS) or hit (DH)
 
             if flag == 'US' or flag == 'UH':
                 if hand.length() == 2 and hand.splithand == False:
-                    print ("Surrender")
+                    #print ("Surrender")
                     hand.surrender = True
                     break
                 else:
@@ -187,25 +192,25 @@ class Player:
 
             if flag == 'H':
                 self.hit(hand, shoe)
-                if hand.busted():
-                    print ("Busted, value=%d" % hand.value)
+                #if hand.busted():   
+                    #print ("Busted, value=%d" % hand.value)
 
             if flag == 'P':
                 self.split(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
                 break
 
             if flag == 'S':
-                print ("Stand, value = %d" % hand.value)
+                #print ("Stand, value = %d" % hand.value)
                 break
 
     def hit(self, hand, shoe):
         c = shoe.deal()
         hand.add_card(c)
-        print ("Hitted: %s" % c)
+        #print ("Hitted: %s" % c)
 
     def split(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY):
         self.hands.append(hand.split())
-        print ("Splitted %s" % hand)
+        #print ("Splitted %s" % hand)
         self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
 
     def playStrategy(self,sh): #adjust play strategy according to True Count
@@ -229,12 +234,12 @@ class Dealer:
     def play(self, shoe):
         while self.hand.value < 17: #deal stand on soft 17
             self.hit(shoe)
-        print("Dealer's hand: %s, value = %d" % (self.hand, self.hand.value))
+        #print("Dealer's hand: %s, value = %d" % (self.hand, self.hand.value))
 
     def hit(self, shoe):
         c = shoe.deal()
         self.hand.add_card(c)
-        print ("Dealer hitted: %s" %c)
+        #print ("Dealer hitted: %s" %c)
 
     # Returns an array of 6 numbers representing the probability that the final score of the dealer is
     # [17, 18, 19, 20, 21, Busted] '''
@@ -258,7 +263,7 @@ class Round:
     
     def play_round(self):
         "play a round"
-        print("round begins")
+        #print("round begins")
         player_initial_deal=[None] * self.player_number
         for i in range(self.player_number):
             self.players.append(Player(self.basic_strategy))
@@ -272,11 +277,13 @@ class Round:
             player_initial_deal[i].add_card(self.sh.deal()) # deal a second card to each player
             player_initial_hands.append([player_initial_deal[i].cards[0], player_initial_deal[i].cards[1]])
             self.players[i].set_hands(player_initial_deal[i],self.dealer.hand)
-            print("player %d, hand %s" % (i, player_initial_deal[i]))
-            print("dealer hand %s" % self.dealer.hand)
+            #print("player %d, hand %s" % (i, player_initial_deal[i]))
+            #print("dealer hand %s" % self.dealer.hand)
+        
+
 
         for i in range(self.player_number):
-            print("player %d plays" % i)
+            #print("player %d plays" % i)
             self.players[i].play(self.sh)
         self.dealer.play(self.sh)
         return player_initial_hands, dealer_init_hand
