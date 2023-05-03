@@ -4,9 +4,11 @@ import math
 
 if __name__ == "__main__":
 
-    ROUNDS = 20000000
-    HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = StrategyImporter('./strategies/BasicStrategy.csv').import_player_strategy()
-    basic_strategy = [HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY]
+    ROUNDS = 2000
+    basic_strategy = {}
+    for i in range(-2,5):
+        HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = StrategyImporter('./strategies/BasicStrategy_'+str(i)+'.csv').import_player_strategy()
+        basic_strategy[i]=[HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY]
     count_list = []
     TC_list=[]
     nb_hands = 0
@@ -24,7 +26,13 @@ if __name__ == "__main__":
     for r in range(ROUNDS):
         TC_list.append(sh._trueCount)
         roundbet=2**math.trunc(sh._trueCount)
-        round = Round(roundbet, sh, basic_strategy,player_number=5)  
+        if math.trunc(sh._trueCount) < -2:
+            strategy_code=-2
+        elif math.trunc(sh._trueCount) > 4:
+            strategy_code=4
+        else:
+            strategy_code=math.trunc(sh._trueCount)
+        round = Round(roundbet, sh, basic_strategy[strategy_code],player_number=5)  
         round.play_round()
         for i in range(round.player_number):
             for hand in round.players[i].hands:
