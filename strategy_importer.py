@@ -6,6 +6,7 @@ class StrategyImporter(object):
 	hard_strategy = {}
 	soft_strategy = {}
 	pair_strategy = {}
+	knight_strategy={}
 	dealer_strategy = {}
 
 	def __init__(self, player_file):
@@ -15,6 +16,7 @@ class StrategyImporter(object):
 		hard = 21
 		soft = 21
 		pair = 20
+		knight = 20
 
 		with open(self.player_file, 'r') as player_csv:
 			reader = csv.DictReader(player_csv, delimiter = ';')
@@ -28,5 +30,8 @@ class StrategyImporter(object):
 				elif pair >= 4:
 					self.pair_strategy[pair] = row
 					pair -= 2
+				elif knight >= 4:
+					self.knight_strategy[knight] = row
+					knight -= 2
 
-		return self.hard_strategy, self.soft_strategy, self.pair_strategy
+		return self.hard_strategy, self.soft_strategy, self.pair_strategy, self.knight_strategy
