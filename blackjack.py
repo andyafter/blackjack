@@ -174,7 +174,7 @@ class Player:
             if hand.soft():
                 flag = SOFT_STRATEGY[hand.value][self.dealer_hand.cards[0]]
             elif hand.splitable() and self.hand_numbers<=4:
-                if hand.knight_bet/hand.horse_bet>=20:
+                if hand.knight_bet/hand.horse_bet>=10:
                     flag = KNIGHT_STRATEGY[hand.value][self.dealer_hand.cards[0]]
                 else:
                     flag = PAIR_STRATEGY[hand.value][self.dealer_hand.cards[0]]

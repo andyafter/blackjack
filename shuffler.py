@@ -88,10 +88,12 @@ class Shuffler:
         #print("past count list:",self.pastCountList)
 
         shuffle(self.cards_dealt) #TODO: improve accuracy
+        cards_dealt_number = len(self.cards_dealt)
         for card in self.cards_dealt:
             self.insert_into_bucket(card)
         self.cards_dealt=[] #clear dealt cards 
         self.check_total()
+        return cards_dealt_number
 
     def check_total(self):
         deck_size = len(self.cards_buffer)
