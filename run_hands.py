@@ -4,7 +4,9 @@ from datetime import datetime
 import csv
 from copy import deepcopy
 
+from logger import Logger
 
+LOGGER = Logger('ConsoleLogger', log_target='console').get_logger()
 
 
 if __name__ == "__main__":
@@ -49,13 +51,14 @@ if __name__ == "__main__":
         else:
             return 800*3
     
-    ROUNDS = 40000000
+    ROUNDS = 4000000
     player_number=5
     min_bet=25
     rolling_strategy_code=6
 
     sh = Shuffler(6, TC_rolling_strategy[rolling_strategy_code])
-    print("Start Time =",datetime.now().strftime("%H:%M:%S"))
+    start_time = datetime.now()
+    LOGGER.info("Start Time ={data_time}".format(data_time=datetime.now().strftime("%H:%M:%S")))
 
     for r in range(ROUNDS):
         TC_list.append(sh._trueCount)
@@ -114,19 +117,24 @@ if __name__ == "__main__":
     #print("pnl List                 ", pnl_list)
     #print("pnl per original bet List", pnl_per_original_bet_list)
     
-    print("Total Rounds = ", ROUNDS)
-    print("Hands per Rounds = ", player_number)
-    print("Total Hands = ", ROUNDS * player_number)
-    print("Average cards dealt per round = ", sum(cards_dealt_number_list)/len(cards_dealt_number_list))
-    print("strategy:" + str(TC_rolling_strategy[rolling_strategy_code]))
-    print("Total Original Bet = ", total_original_bet)
-    print("Total Bet = ", total_bet)
-    print("Total PnL = ", total_pnl)
-    print("Total PnL / Total Original Bet = ", total_pnl / total_original_bet)
-    print("EV distribution ag TC = ", EV_distribution_ag_TC)
-    #print("Original Bet List per 1000 rounds = ", original_bet_list_per1000)
-    #print("PnL List per 1000 rounds = ", pnl_list_per1000)
-    print("End Time =",datetime.now().strftime("%H:%M:%S"))
+    LOGGER.info("Total Rounds = {rounds}".format(rounds=ROUNDS) )
+    LOGGER.info("Hands per Rounds = {player_number}".format(player_number=player_number))
+    LOGGER.info("Total Hands = {total_hands}".format(total_hands=ROUNDS * player_number))
+    LOGGER.info("Average cards dealt per round = {average}".format(average=sum(cards_dealt_number_list)/len(cards_dealt_number_list)))
+    LOGGER.info("strategy:{strategy}".format(strategy=str(TC_rolling_strategy[rolling_strategy_code])))
+    LOGGER.info("Total Original Bet = {total}".format(total=total_original_bet))
+    LOGGER.info("Total Bet = {total_bet}".format(total_bet=total_bet))
+    LOGGER.info("Total PnL = {total_pnl}".format(total_pnl=total_pnl))
+    LOGGER.info("Total PnL / Total Original Bet = {total}".format(total = total_pnl / total_original_bet))
+    LOGGER.info("EV distribution ag TC = {ev}".format(ev=EV_distribution_ag_TC))
+    #LOGGER.info("Original Bet List per 1000 rounds = ", original_bet_list_per1000)
+    #LOGGER.info("PnL List per 1000 rounds = ", pnl_list_per1000)
+    LOGGER.info("End Time = {end_time}".format(end_time=datetime.now().strftime("%H:%M:%S")))
+
+    end_time = datetime.now()
+    elapsed_time = end_time - start_time
+    LOGGER.info("Total Time = {time_spent}".format(time_spent = elapsed_time.total_seconds()))
+
     with open('output.txt','a') as f:
         f.write("bet list per 1000 rounds\n")
         for i in range(len(original_bet_list_per1000)):

@@ -6,9 +6,6 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-import csv
-
-
 ROUNDS = 1000000
 HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = StrategyImporter('./strategies/BasicStrategy.csv').import_player_strategy()
 sh=Shuffler(6,{"max":4,"weight":{1:1,2:1,3:1,4:1}})
