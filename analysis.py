@@ -5,7 +5,7 @@ import math
 
 
 SHOE_SIZE = 6
-BOARD_CARD_NUMBER = 9
+BOARD_CARD_NUMBER = 17
 
 cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
 

@@ -36,20 +36,21 @@ if __name__ == "__main__":
                          {"max":4,"weight":{1:1,2:1,3:1,4:0.5},"remaining_decks":5}, #4
                          {"max":4,"weight":{1:0.76,2:0.44,3:0.33,4:0.24},"remaining_decks":5},#5
                          {"max":4,"weight":{1:0.75,2:0.5,3:0.33,4:0.25},"remaining_decks":5}, #6
-                         {"max":8,"weight":{1:0.95,2:0.68,3:0.49,4:0.44,5:0.40,6:0.35,7:0.32,8:0.27},"remaining_decks":5}, #7 for 1 hand per round 
-                         {"max":4,"weight":{1:0.90,2:0.51,3:0.43,4:0.38},"remaining_decks":5}]  #8 for 2 hands per round
+                         {"max":4,"weight":{1:0.72,2:0.42,3:0.30,4:0.20},"remaining_decks":5.5}, #7
+                         {"max":8,"weight":{1:0.95,2:0.68,3:0.49,4:0.44,5:0.40,6:0.35,7:0.32,8:0.27},"remaining_decks":5}, #8 for 1 hand per round 
+                         {"max":4,"weight":{1:0.90,2:0.51,3:0.43,4:0.38},"remaining_decks":5}]  #9 for 2 hands per round
 
     def roundbet(TC):
         if TC<=0:
             return 25
-        if TC<=0.25:
+        elif TC<=0.25:
             return 25
-        elif TC<=3:
-            return 800*TC
+        elif TC<=2:
+            return 2500*TC
         else:
-            return 800*3
+            return 2500*2
     
-    ROUNDS = 40000000
+    ROUNDS = 20000000
     player_number=5
     min_bet=25
     rolling_strategy_code=6
