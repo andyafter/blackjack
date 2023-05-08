@@ -44,18 +44,18 @@ class Shuffler:
             deal card buckets that have cards between 7 to 10 cards.
         """
         target = randint(0, len(self.buckets) - 1)
-        while len(self.buckets[target]) < 7:
+        while len(self.buckets[target]) < 6:
             target = randint(0, len(self.buckets) - 1)
         return target
     
     def deal(self, ifCovertToCardname=True):
-        if len(self.cards_buffer) == 0:
+        while len(self.cards_buffer) <=9:
             bucket = self.get_bucket_for_dealing()
-            self.cards_buffer = self.cards_buffer + self.buckets[bucket]
+            self.cards_buffer = self.buckets[bucket] + self.cards_buffer 
             # clean up the bucket
             self.buckets[bucket] = []
         
-        c=self.cards_buffer.pop(0) #a bucket of cards will be dealt from index 0
+        c=self.cards_buffer.pop(-1) #a bucket of cards will be dealt from index -1, Last in First Out
         self.cards_dealt.append(c)
         self._count+=self.calcCardCount(self.convertToCardname(c))
         self._roundCount+=self.calcCardCount(self.convertToCardname(c))
