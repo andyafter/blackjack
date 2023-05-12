@@ -1,6 +1,6 @@
-for i in {0..9}
+for i in {0..1}
 do
-   python run_hands.py $i &
+   python3 run_hands.py $i &
 done
 
 # wait for all background processes to finish
