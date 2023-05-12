@@ -1,3 +1,7 @@
+import argparse
+import os
+import csv
+
 from blackjack import *
 import math
 from datetime import datetime
@@ -6,9 +10,28 @@ from copy import deepcopy
 from logger import Logger
 
 LOGGER = Logger('ConsoleLogger', log_target='console').get_logger()
+OUTPUT_FOLDER = "output_data/"
+
+if not os.path.exists(OUTPUT_FOLDER):
+    os.makedirs(OUTPUT_FOLDER)
+if not os.path.exists(OUTPUT_FOLDER+"output/"):
+    os.makedirs(OUTPUT_FOLDER+"output/")
+if not os.path.exists(OUTPUT_FOLDER+"stats/"):
+    os.makedirs(OUTPUT_FOLDER+"stats/")
+
+
+def get_argparser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Metric Engine")
+    parser.add_argument("--rounds", help="how many rounds per simulation thread",
+                        type=int, nargs="?", required=True, default=1000)
+    parser.add_argument("--seq", type=int, required=False, default=1)
+
+    return parser
 
 
 if __name__ == "__main__":
+    args = get_argparser().parse_args()
+    ROUNDS = args.rounds
 
     basic_strategy = {}
     for i in range(-2,5):
@@ -51,7 +74,6 @@ if __name__ == "__main__":
         else:
             return 2500*2
     
-    ROUNDS = 40000
     player_number=5
     min_bet=25
     rolling_strategy_code=6
@@ -117,7 +139,7 @@ if __name__ == "__main__":
     #print("pnl List                 ", pnl_list)
     #print("pnl per original bet List", pnl_per_original_bet_list)
     
-    LOGGER.info("Total Rounds = {rounds}".format(rounds=ROUNDS) )
+    LOGGER.info("Total Rounds = {rounds}".format(rounds=ROUNDS))
     LOGGER.info("Hands per Rounds = {player_number}".format(player_number=player_number))
     LOGGER.info("Total Hands = {total_hands}".format(total_hands=ROUNDS * player_number))
     LOGGER.info("Average cards dealt per round = {average}".format(average=sum(cards_dealt_number_list)/len(cards_dealt_number_list)))
@@ -135,7 +157,7 @@ if __name__ == "__main__":
     elapsed_time = end_time - start_time
     LOGGER.info("Total Time = {time_spent}".format(time_spent = elapsed_time.total_seconds()))
 
-    with open('output.txt','a') as f:
+    with open('{dest}output_{seq}.txt'.format(dest=OUTPUT_FOLDER+"output/", seq=args.seq),'a') as f:
         f.write("bet list per 1000 rounds\n")
         for i in range(len(original_bet_list_per1000)):
             f.write(str(original_bet_list_per1000[i]))
@@ -145,4 +167,22 @@ if __name__ == "__main__":
             f.write(str(pnl_list_per1000[i]))
             f.write("\n")
         f.close()
+
+    data = {"total_rounds": ROUNDS,
+            "player_number": player_number,
+            "total_hands": ROUNDS * player_number,
+            "average_cards_dealt_per_round": sum(cards_dealt_number_list)/len(cards_dealt_number_list),
+            "strategy": str(TC_rolling_strategy[rolling_strategy_code]),
+            "total_original_bet": total_original_bet,
+            "total_bet": total_bet,
+            "total_pnl": total_pnl,
+            "ev_distribution_ag_TC": str(EV_distribution_ag_TC),
+            }
+    with open(OUTPUT_FOLDER+"stats/statistics_{seq}.csv".format(seq=args.seq), 'w') as csv_file:
+        # write data into csv as a single row csv
+        writer = csv.DictWriter(csv_file, fieldnames = data.keys())
+        writer.writeheader()
+        writer.writerow(data)
+
+
     
