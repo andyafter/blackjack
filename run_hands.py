@@ -1,7 +1,6 @@
 from blackjack import *
 import math
 from datetime import datetime
-import csv
 from copy import deepcopy
 
 from logger import Logger
@@ -52,7 +51,7 @@ if __name__ == "__main__":
         else:
             return 2500*2
     
-    ROUNDS = 4000000
+    ROUNDS = 40000
     player_number=5
     min_bet=25
     rolling_strategy_code=6
