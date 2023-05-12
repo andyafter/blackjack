@@ -155,11 +155,11 @@ class Player:
         self.hands = [new_hand]
         self.dealer_hand = new_dealer_hand
 
-    def play(self, sh):
+    def play(self, shoe):
         for hand in self.hands:
             HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY = self.playStrategy(sh)
             #print("play hands: %s, horse = %d, knight = %d" % (hand,hand.horse_bet,hand.knight_bet))
-            self.play_hand(hand, sh, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY)
+            self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY)
 
     def play_hand(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY):
         
