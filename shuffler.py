@@ -32,7 +32,7 @@ class Shuffler:
             generate a bucket number randomly for inserting one card
         """
         target = randint(0, len(self.buckets) - 1)
-        while len(self.buckets[target]) >= 10:   #by alex: should be >=10
+        while len(self.buckets[target]) >= 10:  
             target = randint(0, len(self.buckets) - 1)
         return target
 
@@ -44,18 +44,18 @@ class Shuffler:
             deal card buckets that have cards between 7 to 10 cards.
         """
         target = randint(0, len(self.buckets) - 1)
-        while len(self.buckets[target]) < 7:
+        while len(self.buckets[target]) < 6:
             target = randint(0, len(self.buckets) - 1)
         return target
     
     def deal(self, ifCovertToCardname=True):
-        if len(self.cards_buffer) == 0:
+        while len(self.cards_buffer) <=9:
             bucket = self.get_bucket_for_dealing()
-            self.cards_buffer = self.cards_buffer + self.buckets[bucket]
+            self.cards_buffer = self.buckets[bucket] + self.cards_buffer 
             # clean up the bucket
             self.buckets[bucket] = []
         
-        c=self.cards_buffer.pop(0) #a bucket of cards will be dealt from index 0
+        c=self.cards_buffer.pop(-1) #a bucket of cards will be dealt from index -1, Last in First Out
         self.cards_dealt.append(c)
         self._count+=self.calcCardCount(self.convertToCardname(c))
         self._roundCount+=self.calcCardCount(self.convertToCardname(c))
@@ -80,12 +80,20 @@ class Shuffler:
         self._count=0 # reset accumulative count
         for i in range (min(len(self.pastCountList),self.TCStrategy["max"])):
             self._count += self.pastCountList[-1-i] * self.TCStrategy["weight"][i+1]
+        self._trueCount=self._count/self.TCStrategy["remaining_decks"]
         
+        #print("cards dealt in this round:" , list(map(self.convertToCardname,self.cards_dealt)))
+        #print("current count:", self._count)
+        #print("current true count:", self._trueCount)
+        #print("past count list:",self.pastCountList)
+
         shuffle(self.cards_dealt) #TODO: improve accuracy
+        cards_dealt_number = len(self.cards_dealt)
         for card in self.cards_dealt:
             self.insert_into_bucket(card)
         self.cards_dealt=[] #clear dealt cards 
         self.check_total()
+        return cards_dealt_number
 
     def check_total(self):
         deck_size = len(self.cards_buffer)

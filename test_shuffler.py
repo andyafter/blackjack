@@ -1,4 +1,5 @@
 from shuffler import Shuffler
+import csv
 
 sh = Shuffler(6)
 BOARD_CARD_NUMBER = 20

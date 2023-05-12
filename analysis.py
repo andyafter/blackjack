@@ -5,7 +5,7 @@ import math
 
 
 SHOE_SIZE = 6
-BOARD_CARD_NUMBER = 15
+BOARD_CARD_NUMBER = 17
 
 cardNameMap={1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"T",11:"J",12:"Q",0:"K"}
 
@@ -90,7 +90,7 @@ def delay_effect(sh):
             sh.shuffle_back()
         boardSequence[boardCount].append(newCard)
     for i in range(len(boardSequence)):
-        for j in range(i+1,min(i+10,len(boardSequence))):
+        for j in range(i+1,min(i+30,len(boardSequence))):
             if j-i not in dist:
                 dist[j-i]=common_cards(boardSequence[i],boardSequence[j])
                 times[j-i]=1
@@ -101,13 +101,13 @@ def delay_effect(sh):
         if times[key]!=0:
             dist[key]=dist[key]/times[key]
     print(dist)
-    #plt.bar(dist.keys(),dist.values())
-    #plt.show()
+    plt.bar(dist.keys(),dist.values())
+    plt.show()
             
 
-#sh=Shuffler(SHOE_SIZE)
+sh=Shuffler(SHOE_SIZE,{"max":4,"weight":{1:1,2:1,3:1,4:1},"remaining_decks":5})
 #reappearDistribution()
-#delayEffect(sh)
+delay_effect(sh)
 
 
 '''

@@ -12,12 +12,16 @@ class Hand:
     splithand = False
     surrender = False
     doubled = False
+    original_hand=True
     pnl=0
+
     card_values={"A":1,"K":10,"Q":10,"J":10,"T":10,"9":9,"8":8,"7":7,"6":6,"5":5,"4":4,"3":3,"2":2} # A is 1 by default
 
-    def __init__(self, cards): # cards is a list of card, each card is a letter from A to K
+    def __init__(self, cards, horse_bet, knight_bet): # cards is a list of card, each card is a letter from A to K
         self.cards = cards
-        self._value=self.value 
+        self._value=self.value
+        self.horse_bet = horse_bet
+        self.knight_bet = knight_bet
 
     def __str__(self):
         h = ""
@@ -42,6 +46,9 @@ class Hand:
         self._value = 0
         for c in self.cards:
             self._value += self.card_values[c] # A is 1 by default
+        if self._value>=12:
+            self._is_soft=False
+            return self._value
         if self._value<=11 and self.contain_ace:
             self._value+=10
             self._is_soft=True
@@ -112,15 +119,16 @@ class Hand:
         self.cards.append(card)
         self._value=self.value #whenever a new card is added, the value will be calculated again as well as whether it is soft
 
-    def split(self):
+    def split(self,knight_bet):
         """
         Split the current hand.
         Returns: The new hand created from the split.
         """
         self.splithand = True
         c = self.cards.pop()
-        new_hand = Hand([c])
+        new_hand = Hand([c],self.horse_bet,knight_bet)
         new_hand.splithand = True
+        new_hand.original_hand=False
         return new_hand
 
     def length(self):
@@ -128,6 +136,9 @@ class Hand:
         Returns: The number of cards in the current hand.
         """
         return len(self.cards)
+    
+# TODO: Clean this up
+sh = Shuffler(6, {"max": 4, "weight": {1: 1, 2: 1, 3: 1, 4: 1}})
     
 class Player:
     """
@@ -137,6 +148,8 @@ class Player:
         self.hands = [hand]
         self.dealer_hand = dealer_hand
         self.basic_strategy = basic_strategy
+        self.bet=0
+        self.win=0
         
     def set_hands(self, new_hand, new_dealer_hand):
         self.hands = [new_hand]
@@ -144,10 +157,11 @@ class Player:
 
     def play(self, sh):
         for hand in self.hands:
-            HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = self.playStrategy(sh)
-            self.play_hand(hand, sh, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
+            HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY = self.playStrategy(sh)
+            #print("play hands: %s, horse = %d, knight = %d" % (hand,hand.horse_bet,hand.knight_bet))
+            self.play_hand(hand, sh, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY)
 
-    def play_hand(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY):
+    def play_hand(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY):
         
         while not hand.busted() and not hand.blackjack():
             if hand.length() < 2:
@@ -160,54 +174,61 @@ class Player:
             if hand.soft():
                 flag = SOFT_STRATEGY[hand.value][self.dealer_hand.cards[0]]
             elif hand.splitable() and self.hand_numbers<=4:
-                flag = PAIR_STRATEGY[hand.value][self.dealer_hand.cards[0]]
+                if hand.knight_bet/hand.horse_bet>=10:
+                    flag = KNIGHT_STRATEGY[hand.value][self.dealer_hand.cards[0]]
+                else:
+                    flag = PAIR_STRATEGY[hand.value][self.dealer_hand.cards[0]]
             else:
                 flag = HARD_STRATEGY[hand.value][self.dealer_hand.cards[0]]
 
             if flag == 'DH' or flag == 'DS':
                 if hand.length() == 2:
-                    print ("Double Down")
+                    #print ("Double Down")
                     hand.doubled = True
                     self.hit(hand, shoe)
-                    print("value = %d" % hand.value)
+                    #print("value = %d" % hand.value)
                     break
                 else:
                     flag = flag[1] # if cannot double, then stand (DS) or hit (DH)
 
             if flag == 'US' or flag == 'UH':
                 if hand.length() == 2 and hand.splithand == False:
-                    print ("Surrender")
+                    #print ("Surrender")
                     hand.surrender = True
                     break
                 else:
-                    flag = flag[1] # if cannot double, then stand (US) or hit (UH)
+                    flag = flag[1] # if cannot surrender, then stand (US) or hit (UH)
 
             if flag == 'H':
                 self.hit(hand, shoe)
-                if hand.busted():
-                    print ("Busted, value=%d" % hand.value)
+                #if hand.busted():   
+                    #print ("Busted, value=%d" % hand.value)
 
-            if flag == 'P':
-                self.split(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
+            if flag == 'A':
+                self.split(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY, knight_bet=hand.knight_bet)
+                break
+
+            if flag == 'F':
+                self.split(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY, knight_bet=0)
                 break
 
             if flag == 'S':
-                print ("Stand, value = %d" % hand.value)
+                #print ("Stand, value = %d" % hand.value)
                 break
 
     def hit(self, hand, shoe):
         c = shoe.deal()
         hand.add_card(c)
-        print ("Hitted: %s" % c)
+        #print ("Hitted: %s" % c)
 
-    def split(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY):
-        self.hands.append(hand.split())
-        print ("Splitted %s" % hand)
-        self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY)
+    def split(self, hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY, knight_bet):
+        self.hands.append(hand.split(knight_bet))
+        #print ("Splitted %s" % hand)
+        self.play_hand(hand, shoe, HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY)
 
     def playStrategy(self,sh): #adjust play strategy according to True Count
-        HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY = self.basic_strategy
-        return HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY
+        HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY, KNIGHT_STRATEGY = self.basic_strategy
+        return HARD_STRATEGY, SOFT_STRATEGY, PAIR_STRATEGY , KNIGHT_STRATEGY
     
     @property
     def hand_numbers(self):
@@ -226,12 +247,12 @@ class Dealer:
     def play(self, shoe):
         while self.hand.value < 17: #deal stand on soft 17
             self.hit(shoe)
-        print("Dealer's hand: %s, value = %d" % (self.hand, self.hand.value))
+        #print("Dealer's hand: %s, value = %d" % (self.hand, self.hand.value))
 
     def hit(self, shoe):
         c = shoe.deal()
         self.hand.add_card(c)
-        print ("Dealer hitted: %s" %c)
+        #print ("Dealer hitted: %s" %c)
 
     # Returns an array of 6 numbers representing the probability that the final score of the dealer is
     # [17, 18, 19, 20, 21, Busted] '''
@@ -246,8 +267,9 @@ class Round:
     total_win=0
     total_bet=0
 
-    def __init__(self, bet, sh, basic_strategy, player_number=5): #sh is a shuffler object
+    def __init__(self, bet, sh, basic_strategy, player_number=5,min_bet=25): #sh is a shuffler object
         self.bet = bet
+        self.min_bet=min_bet
         self.sh=sh
         self.basic_strategy=basic_strategy
         self.player_number=player_number
@@ -255,27 +277,36 @@ class Round:
     
     def play_round(self):
         "play a round"
-        print("round begins")
+        #print("round begins")
         player_initial_deal=[None] * self.player_number
         for i in range(self.player_number):
             self.players.append(Player(self.basic_strategy))
-            player_initial_deal[i]=Hand([self.sh.deal()]) # deal a first card to each player
-        self.dealer=Dealer(Hand([self.sh.deal()])) # deal a card to the dealer
+            player_initial_deal[i]=Hand([self.sh.deal()],self.min_bet,self.bet - self.min_bet) # deal a first card to each player
+
+        dealer_init_hand = [self.sh.deal()]
+        player_initial_hands = []
+
+        self.dealer=Dealer(Hand([dealer_init_hand[0]],0,0)) # deal a card to the dealer
         for i in range(self.player_number):
             player_initial_deal[i].add_card(self.sh.deal()) # deal a second card to each player
+            player_initial_hands.append([player_initial_deal[i].cards[0], player_initial_deal[i].cards[1]])
             self.players[i].set_hands(player_initial_deal[i],self.dealer.hand)
-            print("player %d, hand %s" % (i, player_initial_deal[i]))
-            print("dealer hand %s" % self.dealer.hand)
+            #print("player %d, hand %s" % (i, player_initial_deal[i]))
+            #print("dealer hand %s" % self.dealer.hand)
+        
+
 
         for i in range(self.player_number):
-            print("player %d plays" % i)
+            #print("player %d plays" % i)
             self.players[i].play(self.sh)
         self.dealer.play(self.sh)
+        return player_initial_hands, dealer_init_hand
 
     
     def get_hand_winnings(self, hand): # must first play the round
         win = 0.0
-        bet = self.bet
+        bet = hand.horse_bet + hand.knight_bet
+
         if not hand.surrender:
             if hand.busted():
                 status = "LOST"
@@ -300,16 +331,21 @@ class Round:
             status = "SURRENDER"
 
         if status == "LOST":
-            win += -1
+            if self.dealer.hand.blackjack() and not hand.original_hand:
+                win += 0
+            else:
+                win += -1
         elif status == "WON":
             win += 1
         elif status == "WON 3:2":
             win += 1.5
         elif status == "SURRENDER":
             win += -0.5
+
         if hand.doubled:
-            #win *= 2  this line should be deleted
-            bet *= 2
+            bet *=2
+            if self.dealer.hand.blackjack():
+                win *=0.5
 
         win *= bet
 
